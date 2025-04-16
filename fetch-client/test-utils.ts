@@ -8,12 +8,12 @@ import { isValidActivityPubMediaType } from "./activitypub.js"
  * perform generic testing on the provided pub
  * @param pub - pub to test
  */
-export async function testStorageClient(pub: IStorageClient) {
+export async function testStorageClient(pub: IStorageClient, uuid?: string) {
   const space = pub.space()
   const resource = space.resource()
 
   // store a message
-  const nonce = crypto.randomUUID()
+  const nonce = uuid || crypto.randomUUID()
   const message = new Blob([nonce],{type:'text/plain'})
   await resource.put(message)
 

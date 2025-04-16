@@ -22,7 +22,8 @@ import assert from "assert"
 export default async function testSetSpaceController(
   pub: IStorageClient,
   assert: typeof nodeAssert,
-  testing: Pick<typeof NodeTest,'test'>
+  testing: Pick<typeof NodeTest,'test'>,
+  uuid?: string,
 ) {
   const { test } = testing;
   await test('can put a resource with an http signature', async (t) => {
@@ -39,7 +40,7 @@ export default async function testSetSpaceController(
   */
    {
     // create space b
-    const spaceBUuid = crypto.randomUUID()
+    const spaceBUuid = uuid || crypto.randomUUID()
     const spaceBObject = {
       id: `urn:uuid:${spaceBUuid}` as UrnUuid,
     }

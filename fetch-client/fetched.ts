@@ -355,11 +355,12 @@ class SpaceFetched implements ISpace {
   //   }
   // }
   resource (resourcePathParam?: string, options: {
-    signer?: ISigner
+    signer?: ISigner,
+    uuid?: UrnUuid
   } = {}) {
     let resourcePath: `/${string}`
     if (typeof resourcePathParam === 'undefined') {
-      resourcePath = `/${crypto.randomUUID()}` as const
+      resourcePath = `/${options.uuid || crypto.randomUUID}` as const
     } else if (typeof resourcePathParam === 'string') {
       if (resourcePathParam.startsWith('/')) {
         resourcePath = resourcePathParam as `/${string}`
@@ -563,7 +564,7 @@ class StorageFetched implements IStorageClient {
       }
     } else if (typeof optionsOrId === 'object' || !optionsOrId) {
       options = {
-        id: optionsOrId?.id || `urn:uuid:${crypto.randomUUID()}`,
+        id: optionsOrId?.id || `urn:uuid:${crypto.randomUUID()}` as UrnUuid,
         ...optionsOrId
       }
     } else {
