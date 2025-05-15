@@ -80,38 +80,57 @@ Example key pair generation (for an in-browser SPA), for persistence in local
 storage.
 
 ```ts
-import { Ed25519Signer } from '@did.coop/did-key-ed25519'
+import { Ed25519VerificationKey2020 } from '@digitalcredentials/ed25519-verification-key-2020'
 
-const appDidSigner = await Ed25519Signer.generate()
+const keyPair = await Ed25519VerificationKey2020.generate()
+keyPair.id = `did:key:${keyPair.fingerprint()}#${keyPair.fingerprint()}`
+
+const appDidSigner = keyPair.signer()
 ```
 
 Example storing and loading:
 
 ```ts
 // Serialize to JSON for storage
-const exportedKeyPair = appDidSigner.toJSON()
+const exportedKeyPair = await keyPair.export({publicKey: true, privateKey: true})
 localStorage.setItem('app-DID', JSON.stringify(exportedKeyPair))
 
 // Load from storage and turn back into a DID Signer
 const loadedKeyPair = localStorage.getItem('app-DID')
-const appDidSigner = Ed25519Signer.fromJSON(loadedKeyPair)
+const keyPair = await Ed25519VerificationKey2020.from(loadedKeyPair)
+const appDidSigner = keyPair.signer()
 ```
 
-Create a Wallet Attached Storage Client, connect it to a remote url:
+### Provisioning a New Space
+
+Provision a new space :
 
 ```ts
 import { WalletStorage } from '@did.coop/wallet-attached-storage'
 
 const url = 'https://data.pub' // load this from config
 
-let storage
+let space
 try {
-  storage = WalletStorage.connect({ url, signer: appDidSigner })
+  space = await WalletStorage.provisionSpace({ url, signer: appDidSigner })
 } catch (e) {
   console.error('Error connecting:', e)
   throw e
 }
+// Save the space.id for later re-use
+const spaceId = space.id
 ```
+
+### Connecting to an Existing (provisioned) Space
+
+```ts
+import { WalletStorage } from './WalletStorage';
+
+const storage = WalletStorage.storage({ url: 'https://data.pub' })
+const space = storage.space({ id, signer })
+```
+
+### Reading and Writing
 
 Now you can read and write resources to and from collections:
 

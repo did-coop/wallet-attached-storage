@@ -6,8 +6,9 @@ import { ISigner, ISpace, UrnUuid } from '@wallet.storage/fetch-client/types'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class WalletStorage {
-  // static connect ({ url, signer }: { url: string, signer: ISigner }): ? {
-  // }
+  static storage ({ url }: { url: string }): StorageClient {
+    return new StorageClient(new URL(url))
+  }
 
   /**
    * Provisions an ephemeral Wallet Attached Storage space (for use by an
@@ -15,6 +16,8 @@ export class WalletStorage {
    *
    * @param url {string} - URL to a Storage server.
    * @param signer {ISigner} - Ed25519 did:key Signer.
+   * @param [id] {UrnUuid} - Optional 'id' of the space (if not given, will be
+   *   provided by the server).
    */
   static async provisionSpace (
     { url, signer, id }: { url: string | URL, signer: ISigner, id?: UrnUuid }
